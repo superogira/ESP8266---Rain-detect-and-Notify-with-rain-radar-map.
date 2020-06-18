@@ -13,9 +13,11 @@ String IPaddress;
 //ดูรายละเอียดและ Script ได้ที่ https://github.com/superogira/php---Bangkok-rain-radar-line-notify
 int rainRadarMap = 1;
 
+//ของเซนเซฮร์ตรวจจับน้ำฝน
 int analogPin = A0; //ประกาศตัวแปร ให้ analogPin 
 int val = 0;
 
+//ตั้งค่าเวลา
 const long utcOffsetInSeconds = 25200;
 char daysOfTheWeek[7][12] = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
 // Define NTP Client to get time
