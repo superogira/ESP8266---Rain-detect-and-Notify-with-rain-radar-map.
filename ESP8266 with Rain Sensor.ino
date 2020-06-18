@@ -9,6 +9,10 @@
 HTTPClient http;
 String IPaddress;
 
+//เปิดระบบส่งแผนที่ฝนเข้า Line ***ต้องมี PHP/Web Server ด้วย ถ้าไม่มี ขี้เกียจลง ยุ่งยาก ให้ Set ค่าตรงนี้เป็น 0
+//ดูรายละเอียดและ Script ได้ที่ https://github.com/superogira/php---Bangkok-rain-radar-line-notify
+int rainRadarMap = 1;
+
 int analogPin = A0; //ประกาศตัวแปร ให้ analogPin 
 int val = 0;
 
@@ -84,26 +88,30 @@ void loop()
 	raining = 1;
     littlerain = 1;
     norain = 0;
-    
-    HTTPClient http;  //Declare an object of class HTTPClient
-    http.begin("http://localhost/rain_radar_bangkok.php");  //Specify request destination
-    http.GET();
-    Serial.println("ทำการเรียก Url เพื่อดึงข้อมูลเรดาร์ฝนส่งเข้า Line");                     //Print the response payload
-	http.end();   //Close connection
+	
+    if (rainRadarMap == 1) {
+		HTTPClient http;  //Declare an object of class HTTPClient
+		http.begin("http://localhost/bangkok_rain_radar_to_line.php");  //Specify request destination
+		http.GET();
+		Serial.println("ทำการเรียก Url เพื่อดึงข้อมูลเรดาร์ฝนส่งเข้า Line");                     //Print the response payload
+		http.end();   //Close connection
+	}
   }
   
   if (median < 1024 && raining == 0 && littlerain == 0) {
     littlecount++;
     if (littlecount == 18) {
-    LINE.notify("ค่าของเซนเซอร์ตรวจจับน้ำฝนมีการเปลี่ยนแปลง ฝนอาจจะกำลังตกเบา ๆ ปอย ๆ หรือมีบางสิ่งตกค้างอยู่บนเซนเซอร์");
-    littlerain = 1;
-    norain = 0;
+		LINE.notify("ค่าของเซนเซอร์ตรวจจับน้ำฝนมีการเปลี่ยนแปลง ฝนอาจจะกำลังตกเบา ๆ ปอย ๆ หรือมีบางสิ่งตกค้างอยู่บนเซนเซอร์");
+		littlerain = 1;
+		norain = 0;
 
-    HTTPClient http;  //Declare an object of class HTTPClient
-    http.begin("http://localhost/rain_radar_bangkok.php");  //Specify request destination
-    http.GET();
-    Serial.println("ทำการเรียก Url เพื่อดึงข้อมูลเรดาร์ฝนส่งเข้า Line");                     //Print the response payload
-    http.end();   //Close connection
+		if (rainRadarMap == 1) {
+			HTTPClient http;  //Declare an object of class HTTPClient
+			http.begin("http://localhost/bangkok_rain_radar_to_line.php");  //Specify request destination
+			http.GET();
+			Serial.println("ทำการเรียก Url เพื่อดึงข้อมูลเรดาร์ฝนส่งเข้า Line");                     //Print the response payload
+			http.end();   //Close connection
+		}
     }
   } else {
     littlecount = 0;
@@ -152,15 +160,17 @@ void loop()
   if (median > 1023 && norain == 0) {
     noraincount++;
     if (noraincount == 18) {
-    littlerain = 0;
-    norain = 1;
-    LINE.notify("ไม่พบน้ำฝนเพิ่มเติมอีก ฝนได้หยุดตกโดยสมบูรณ์มาซักพักแล้ว");
+		littlerain = 0;
+		norain = 1;
+		LINE.notify("ไม่พบน้ำฝนเพิ่มเติมอีก ฝนได้หยุดตกโดยสมบูรณ์มาซักพักแล้ว");
     
-    HTTPClient http;  //Declare an object of class HTTPClient
-    http.begin("http://localhost/rain_radar_bangkok.php");  //Specify request destination
-    http.GET();
-    Serial.println("ทำการเรียก Url เพื่อดึงข้อมูลเรดาร์ฝนส่งเข้า Line");                     //Print the response payload
-    http.end();   //Close connection
+		if (rainRadarMap == 1) {
+			HTTPClient http;  //Declare an object of class HTTPClient
+			http.begin("http://localhost/bangkok_rain_radar_to_line.php");  //Specify request destination
+			http.GET();
+			Serial.println("ทำการเรียก Url เพื่อดึงข้อมูลเรดาร์ฝนส่งเข้า Line");                     //Print the response payload
+			http.end();   //Close connection
+		}
     }
   } else {
     noraincount = 0;
@@ -170,9 +180,9 @@ void loop()
     LINE.notify("ค่าน้ำฝนปัจจุบัน = " + String (val) + "\nค่าเฉลี่ยจากการคำนวนครั้งล่าสุด = " + String (median));
   }
   
-  if (timeClient.getMinutes()  == 2  && timeClient.getSeconds()  < 10) {
+  if (rainRadarMap == 1 && timeClient.getMinutes()  == 2  && timeClient.getSeconds()  < 10) {
     HTTPClient http;  //Declare an object of class HTTPClient
-    http.begin("http://localhost/rain_radar_bangkok.php");  //Specify request destination
+    http.begin("http://localhost/bangkok_rain_radar_to_line.php");  //Specify request destination
     http.GET();
     Serial.println("ทำการเรียก Url เพื่อดึงข้อมูลเรดาร์ฝนส่งเข้า Line");
     http.end();   //Close connection
