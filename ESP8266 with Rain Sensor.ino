@@ -55,6 +55,9 @@ int heavyrain = 0;
 int superrain = 0;
 int val1min = 0;
 int loop600 = 0;
+
+int sentdata = 0;
+int sentmap = 0;
  
 void loop()
 {
@@ -178,16 +181,24 @@ void loop()
     noraincount = 0;
     }
 
-  if ((timeClient.getMinutes()  == 0 || timeClient.getMinutes()  == 30) && timeClient.getSeconds()  < 10) {
+  if ((timeClient.getMinutes()  == 0 || timeClient.getMinutes()  == 30) && sentdata == 0) {
     LINE.notify("ค่าน้ำฝนปัจจุบัน = " + String (val) + "\nค่าเฉลี่ยจากการคำนวนครั้งล่าสุด = " + String (median));
+    sentdata = 1;
+  }
+  if ((timeClient.getMinutes()  == 1 || timeClient.getMinutes()  == 31) && sentdata == 1) {
+    sentdata = 0;
   }
   
-  if (rainRadarMap == 1 && timeClient.getMinutes()  == 2  && timeClient.getSeconds()  < 10) {
+  if (rainRadarMap == 1 && timeClient.getMinutes()  == 1  && sentmap == 0) {
     HTTPClient http;  //Declare an object of class HTTPClient
     http.begin("http://localhost/bangkok_rain_radar_to_line.php");  //Specify request destination
     http.GET();
     Serial.println("ทำการเรียก Url เพื่อดึงข้อมูลเรดาร์ฝนส่งเข้า Line");
-    http.end();   //Close connection
+    http.end();   //Close connection  
+    sentdata = 1;
+  }
+  if (rainRadarMap == 1 && timeClient.getMinutes()  == 2  && sentmap == 1) { 
+    sentdata = 0;
   }
   
   Serial.println("");
